@@ -1,0 +1,78 @@
+### API Gateway - Autenticação
+
+# Registrar usuário
+POST https://localhost:7000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "test123",
+  "email": "test@example.com"
+}
+
+### Login
+POST https://localhost:7000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "test123"
+}
+
+### Variável para token (copiar do login)
+@token = <TOKEN_AQUI>
+
+### Estoque - Listar produtos
+GET https://localhost:7000/api/produtos
+Authorization: Bearer {{token}}
+
+### Estoque - Buscar produto específico
+GET https://localhost:7000/api/produtos/1
+Authorization: Bearer {{token}}
+
+### Estoque - Criar produto
+POST https://localhost:7000/api/produtos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Smartphone Gamer",
+  "descricao": "Smartphone para jogos com alta performance",
+  "preco": 1200.00,
+  "quantidadeEstoque": 15
+}
+
+### Vendas - Criar pedido
+POST https://localhost:7000/api/pedidos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "itens": [
+    {
+      "produtoId": 1,
+      "quantidade": 2
+    },
+    {
+      "produtoId": 2,
+      "quantidade": 1
+    }
+  ]
+}
+
+### Vendas - Listar pedidos
+GET https://localhost:7000/api/pedidos
+Authorization: Bearer {{token}}
+
+### Vendas - Buscar pedido específico
+GET https://localhost:7000/api/pedidos/1
+Authorization: Bearer {{token}}
+
+### Vendas - Cancelar pedido
+PUT https://localhost:7000/api/pedidos/1/cancelar
+Authorization: Bearer {{token}}ioAvanade_HostAddress = http://localhost:5130
+
+GET {{DesafioAvanade_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

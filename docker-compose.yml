@@ -1,0 +1,76 @@
+
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-server
+    hostname: my-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - microservices
+
+  apigateway:
+    build:
+      context: .
+      dockerfile: src/ApiGateway/Dockerfile
+    container_name: apigateway
+    ports:
+      - "7000:80"
+      - "7001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    depends_on:
+      - rabbitmq
+    networks:
+      - microservices
+
+  estoque-service:
+    build:
+      context: .
+      dockerfile: src/EstoqueService/Dockerfile
+    container_name: estoque-service
+    ports:
+      - "7002:80"
+      - "7003:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ConnectionStrings__RabbitMQ=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+    networks:
+      - microservices
+
+  vendas-service:
+    build:
+      context: .
+      dockerfile: src/VendasService/Dockerfile
+    container_name: vendas-service
+    ports:
+      - "7004:80"
+      - "7005:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ConnectionStrings__RabbitMQ=amqp://guest:guest@rabbitmq:5672/
+      - Services__EstoqueService=https://estoque-service:443
+    depends_on:
+      - rabbitmq
+      - estoque-service
+    networks:
+      - microservices
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  microservices:
+    driver: bridge
